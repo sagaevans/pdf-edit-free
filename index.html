@@ -1,52 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-<title>PDF Editor - Remove | Split | Merge | Rotate</title>
+<meta charset="UTF-8">
+<title>PDF Edit Free - Tools PDF Online</title>
 <style>
-body {font-family: Arial; text-align:center; padding:25px;background:#f7f7f7;}
-.container{width:90%;max-width:550px;margin:auto;background:white;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
-input,button{margin:7px;padding:10px;border-radius:6px;}
-button{cursor:pointer;background:#e91e63;color:white;border:none;}
-h2{margin-bottom:10px;}
-textarea{width:80%;height:50px;}
+body{
+  font-family: Arial, sans-serif;
+  margin: 0; padding: 0;
+  background: #f7f7f7; text-align: center;
+}
+header{
+  background: #ffffff;
+  padding: 18px;
+  font-size: 26px;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+}
+.container{
+  margin-top: 40px;
+}
+.button{
+  display:inline-block;
+  margin: 10px;
+  padding: 14px 26px;
+  background:#0078ff;
+  color:#fff;
+  text-decoration:none;
+  font-size:18px;
+  border-radius:8px;
+  transition:.2s;
+}
+.button:hover{
+  opacity:.8;
+}
 </style>
 </head>
- <h2>PDF Tools</h2>
-<a href="editor.html" style="background:#0078ff;color:white;padding:10px 18px;border-radius:6px;text-decoration:none;font-size:18px;">
-Buka PDF Visual Editor
-</a>
 <body>
 
+<header>PDF Edit Free</header>
+
 <div class="container">
-<h2>PDF Editor (Delete, Split, Merge, Rotate)</h2>
-<p>Pilih fungsi proses PDF:</p>
+  <h2>Tools PDF Gratis Online</h2>
+  <p>Kelola PDF tanpa software – langsung dari browser</p>
 
-<input type="file" id="pdfFiles" accept="application/pdf" multiple><br><br>
+  <!-- 🔥 Tombol utama menuju viewer editor -->
+  <a href="editor.html" class="button">Buka PDF Visual Editor</a>
 
-<h3>🗑 Hapus Halaman</h3>
-<textarea id="removePages" placeholder="Contoh: 1,3,5"></textarea><br>
-<button onclick="removePagesFunc()">Hapus Halaman</button><br><br>
+  <br><br>
 
-<h3>🔄 Rotate Halaman</h3>
-<input id="rotatePage" type="text" placeholder="Halaman (1,2...)">
-<select id="rotateDeg">
- <option value="90">90°</option>
- <option value="180">180°</option>
- <option value="270">270°</option>
-</select>
-<button onclick="rotatePageFunc()">Rotate</button><br><br>
+  <!-- Jika mau tambahkan fitur dari script.js lama -->
+  <a href="index.html" class="button" style="background:#e91e63;">Versi Simple Tools (Old)</a>
 
-<h3>✂ Split PDF</h3>
-<button onclick="splitPDF()">Pisah PDF</button><br><br>
-
-<h3>➕ Merge PDF</h3>
-<p>Upload 2 file PDF atau lebih lalu klik merge</p>
-<button onclick="mergePDF()">Gabungkan</button><br><br>
-
+  <!-- kamu bisa menambah tombol berikut kedepan -->
+  <!-- <a href="pdf-to-excel.html" class="button">PDF ➝ Excel</a> -->
+  <!-- <a href="merge.html" class="button">Merge</a> -->
+  <!-- <a href="split.html" class="button">Split</a> -->
 </div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-<script src="script.js"></script>
 
 </body>
 </html>
