@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>PDF Visual Editor - Viewer Mode</title>
+<style>
+body{
+    font-family: Arial; margin:0; background:#f1f1f1;
+}
+header{
+    background:#ffffff; padding:12px 20px; display:flex;
+    align-items:center; justify-content:space-between;
+    border-bottom:1px solid #ddd;
+    position:sticky; top:0; z-index:10;
+}
+header h2{ margin:0;}
+.tools button{
+    padding:8px 14px; margin-right:8px; border:none;
+    background:#0078ff; color:white; border-radius:6px; cursor:pointer;
+}
+.tools button.red{background:#ff3b3b;}
+.tools button.green{background:#00b050;}
+.tools button.orange{background:#ffaa00;}
+
+#fileInput{display:none;}
+#pdfContainer{
+    padding:20px;
+    display:flex; flex-wrap:wrap;
+    gap:15px; justify-content:center;
+}
+.pageBox{
+    background:white; border:1px solid #ccc; border-radius:6px;
+    width:180px; padding:10px;
+    text-align:center; cursor:pointer;
+    transition: .2s;
+}
+.pageBox:hover{
+    transform:scale(1.03);
+    box-shadow:0 4px 10px rgba(0,0,0,.1);
+}
+.pageBox img{
+    width:100%;
+}
+
+/* Selected effect */
+.selected{
+    border:3px solid #0078ff !important;
+}
+</style>
+</head>
+<body>
+
+<header>
+    <h2>PDF Editor Viewer</h2>
+
+    <div class="tools">
+        <button onclick="selectFile()">📄 Buka PDF</button>
+        <button class="orange" onclick="rotatePage()">🔄 Rotate</button>
+        <button class="red" onclick="deletePages()">🗑 Delete</button>
+        <button class="green" onclick="downloadPDF()">💾 Export PDF</button>
+    </div>
+</header>
+
+<input type="file" id="fileInput" accept="application/pdf" onchange="openPDF(event)">
+
+<div id="pdfContainer"> 
+    <h3>📄 Upload PDF untuk menampilkan halaman di sini...</h3>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="viewer.js"></script>
+</body>
+</html>
