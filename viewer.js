@@ -2,52 +2,51 @@ let pdfDoc = null;
 let pdfBytes = null;
 let selectedPages = [];
 let pageRotation = {};
-let fileInput = document.getElementById("fileInput");
 let viewer = document.getElementById("pdfContainer");
+let fileInput = document.getElementById("fileInput");
 
+// ================= OPEN FILE =================
 function selectFile(){ fileInput.click(); }
 
-// ======================= LOAD PDF ==========================
 async function openPDF(e){
     const file = e.target.files[0];
     if(!file) return;
-    pdfBytes = await file.arrayBuffer();
 
+    pdfBytes = await file.arrayBuffer();
     pdfDoc = await pdfjsLib.getDocument({data:pdfBytes}).promise;
+
     renderPDF();
 }
 
-// ======================= RENDER VIEWER ======================
+// ================= RENDER VIEW =================
 async function renderPDF(){
-    viewer.innerHTML = "";
-    selectedPages = [];
+    viewer.innerHTML="";
+    selectedPages=[];
 
-    for(let i=1; i<=pdfDoc.numPages; i++){
+    for(let i=1;i<=pdfDoc.numPages;i++){
         const page = await pdfDoc.getPage(i);
-
-        let rotationAngle = pageRotation[i] || 0;
-        let viewport = page.getViewport({scale:0.35, rotation:rotationAngle});
+        const rotation = pageRotation[i]||0;
+        const viewport = page.getViewport({scale:0.35,rotation});
 
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
+        canvas.width = viewport.width; canvas.height = viewport.height;
 
-        await page.render({canvasContext:ctx, viewport:viewport}).promise;
+        await page.render({canvasContext:ctx,viewport}).promise;
 
-        let box = document.createElement("div");
+        const box = document.createElement("div");
         box.className="pageBox";
-        box.innerHTML = `<img src="${canvas.toDataURL()}"><div>Halaman ${i}</div>`;
-        box.onclick = ()=> toggle(i,box);
+        box.innerHTML=`<img src="${canvas.toDataURL()}"><div>Halaman ${i}</div>`;
+        box.onclick=()=>selectPage(i,box);
 
         viewer.appendChild(box);
     }
 }
 
-// ======================= SELECT PAGE ========================
-function toggle(i, box){
+// ============= SELECT PAGES =============
+function selectPage(i,box){
     if(selectedPages.includes(i)){
-        selectedPages = selectedPages.filter(p=>p!=i);
+        selectedPages = selectedPages.filter(p=>p!==i);
         box.classList.remove("selected");
     }else{
         selectedPages.push(i);
@@ -55,83 +54,79 @@ function toggle(i, box){
     }
 }
 
-// ======================= ROTATE =============================
+// ============= ROTATE =============
 async function rotatePage(){
-    if(selectedPages.length==0){ alert("Pilih halaman dulu"); return; }
+    if(selectedPages.length==0) return alert("Pilih halaman dulu");
 
-    selectedPages.forEach(p=>{
-        pageRotation[p] = (pageRotation[p]||0) + 90;
-    });
-
+    selectedPages.forEach(p=> pageRotation[p]=(pageRotation[p]||0)+90);
     renderPDF();
 }
 
-// ======================= DELETE =============================
+// ============= DELETE =============
 async function deletePages(){
-    if(selectedPages.length==0){ alert("Tidak ada halaman dipilih"); return; }
+    if(selectedPages.length==0) return alert("Pilih halaman yang akan dihapus");
 
-    const {PDFDocument} = PDFLib;
-    const newPDF = await PDFDocument.create();
-    const original = await PDFDocument.load(pdfBytes);
+    const {PDFDocument}=PDFLib;
+    const newPdf=await PDFDocument.create();
+    const src=await PDFDocument.load(pdfBytes);
 
-    for(let i=1;i<=pdfDoc.numPages;i++){
+    for(let i=1;i<=src.getPageCount();i++){
         if(!selectedPages.includes(i)){
-            const [pg] = await newPDF.copyPages(original,[i-1]);
-            newPDF.addPage(pg);
+            const [pg]=await newPdf.copyPages(src,[i-1]);
+            newPdf.addPage(pg);
         }
     }
 
-    pdfBytes = await newPDF.save();
-    pdfDoc   = await pdfjsLib.getDocument({data:pdfBytes}).promise;
+    pdfBytes=await newPdf.save();
+    pdfDoc=await pdfjsLib.getDocument({data:pdfBytes}).promise;
 
-    selectedPages = [];
+    selectedPages=[];
     renderPDF();
 }
 
-// ======================= EXPORT =============================
+// ============= EXPORT (FULL ROTATION FIX) =============
 async function downloadPDF(){
-    const {PDFDocument} = PDFLib;
-    const newPDF = await PDFDocument.create();
-    const original = await PDFDocument.load(pdfBytes);
+    const {PDFDocument,degrees}=PDFLib;
+    const original=await PDFDocument.load(pdfBytes);
+    const newPDF=await PDFDocument.create();
 
-    for(let i=1;i<=pdfDoc.numPages;i++){
-        const [pg] = await newPDF.copyPages(original,[i-1]);
-        if(pageRotation[i]) pg.setRotation(pageRotation[i]);
+    for(let i=0;i<original.getPageCount();i++){
+        const [pg]=await newPDF.copyPages(original,[i]);
+
+        if(pageRotation[i+1]) pg.setRotation(degrees(pageRotation[i+1] % 360));
         newPDF.addPage(pg);
     }
 
-    const data = await newPDF.save();
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([data],{type:"application/pdf"}));
-    a.download = "edited.pdf";
+    const out=await newPDF.save();
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([out],{type:"application/pdf"}));
+    a.download="edited.pdf";
     a.click();
 }
 
-// ======================= INSERT / MERGE PDF =================
+// ============= INSERT / MERGE PDF =============
 async function insertPDF(){
-    const picker = document.createElement("input");
-    picker.type="file"; picker.accept="application/pdf";
-    picker.onchange = async(e)=>{
+    const pick=document.createElement("input");
+    pick.type="file"; pick.accept="application/pdf";
 
-        const file = e.target.files[0];
+    pick.onchange=async(e)=>{
+        const file=e.target.files[0];
         if(!file) return;
 
-        const addBytes = await file.arrayBuffer();
-        const {PDFDocument} = PDFLib;
+        const add=await file.arrayBuffer();
+        const {PDFDocument}=PDFLib;
 
-        const base = await PDFDocument.load(pdfBytes);
-        const mergePDF = await PDFDocument.load(addBytes);
+        const base=await PDFDocument.load(pdfBytes);
+        const src=await PDFDocument.load(add);
 
-        const pages = await base.copyPages(mergePDF,
-            mergePDF.getPageIndices()
-        );
-        pages.forEach(p=> base.addPage(p)); // 🔥 Tambah ke belakang
+        const pages=await base.copyPages(src,src.getPageIndices());
+        pages.forEach(p=>base.addPage(p));
 
-        pdfBytes = await base.save();
-        pdfDoc = await pdfjsLib.getDocument({data:pdfBytes}).promise;
+        pdfBytes=await base.save();
+        pdfDoc=await pdfjsLib.getDocument({data:pdfBytes}).promise;
 
         renderPDF();
-        alert("PDF berhasil digabung");
-    }
-    picker.click();
+        alert("Berhasil menambahkan PDF!");
+    };
+    pick.click();
 }
